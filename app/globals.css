@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Updated color palette to lavender theme for Pokemon-style game */
+  --background: 0.96 0.01 270;
+  --foreground: 0.35 0.02 270;
+  --card: 1 0 0;
+  --card-foreground: 0.75 0.15 310;
+  --popover: 1 0 0;
+  --popover-foreground: 0.35 0.02 270;
+  --primary: 0.75 0.15 310;
+  --primary-foreground: 0.35 0.02 270;
+  --secondary: 0.78 0.08 280;
+  --secondary-foreground: 1 0 0;
+  --muted: 0.96 0.01 270;
+  --muted-foreground: 0.45 0.02 270;
+  --accent: 0.68 0.25 280;
+  --accent-foreground: 1 0 0;
+  --destructive: 0.65 0.25 15;
+  --destructive-foreground: 1 0 0;
+  --border: 0.78 0.08 280;
+  --input: 1 0 0;
+  --ring: 0.68 0.25 280;
+  --chart-1: 0.75 0.15 310;
+  --chart-2: 0.68 0.25 280;
+  --chart-3: 0.78 0.08 280;
+  --chart-4: 0.96 0.01 270;
+  --chart-5: 1 0 0;
+  --radius: 0.5rem;
+  --sidebar: 0.75 0.15 310;
+  --sidebar-foreground: 1 0 0;
+  --sidebar-primary: 0.68 0.25 280;
+  --sidebar-primary-foreground: 1 0 0;
+  --sidebar-accent: 0.78 0.08 280;
+  --sidebar-accent-foreground: 0.35 0.02 270;
+  --sidebar-border: 0.78 0.08 280;
+  --sidebar-ring: 0.68 0.25 280;
+}
+
+.dark {
+  --background: 0.15 0.02 270;
+  --foreground: 0.95 0.01 270;
+  --card: 0.18 0.02 270;
+  --card-foreground: 0.95 0.01 270;
+  --popover: 0.18 0.02 270;
+  --popover-foreground: 0.95 0.01 270;
+  --primary: 0.75 0.15 310;
+  --primary-foreground: 0.15 0.02 270;
+  --secondary: 0.25 0.02 270;
+  --secondary-foreground: 0.95 0.01 270;
+  --muted: 0.25 0.02 270;
+  --muted-foreground: 0.65 0.02 270;
+  --accent: 0.68 0.25 280;
+  --accent-foreground: 0.95 0.01 270;
+  --destructive: 0.55 0.25 15;
+  --destructive-foreground: 0.95 0.01 270;
+  --border: 0.25 0.02 270;
+  --input: 0.25 0.02 270;
+  --ring: 0.68 0.25 280;
+  --chart-1: 0.75 0.15 310;
+  --chart-2: 0.68 0.25 280;
+  --chart-3: 0.78 0.08 280;
+  --chart-4: 0.25 0.02 270;
+  --chart-5: 0.18 0.02 270;
+  --sidebar: 0.18 0.02 270;
+  --sidebar-foreground: 0.95 0.01 270;
+  --sidebar-primary: 0.75 0.15 310;
+  --sidebar-primary-foreground: 0.95 0.01 270;
+  --sidebar-accent: 0.25 0.02 270;
+  --sidebar-accent-foreground: 0.95 0.01 270;
+  --sidebar-border: 0.25 0.02 270;
+  --sidebar-ring: 0.68 0.25 280;
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added custom animation utilities for battle effects */
+@layer utilities {
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
