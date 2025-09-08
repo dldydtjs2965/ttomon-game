@@ -9,8 +9,9 @@ import { generateEnemyMonster, generateEnemyAction, executeTurn, executeSequenti
 import { getAllMonstersWithStats, getCurrentUserMonsters } from "@/lib/supabase/monsters-service"
 import { convertAllMonstersToGameFormat, convertUserMonstersToGameMonsters, convertMonsterWithStats, convertUserMonstersToGameMonstersWithDBSkills, convertAllMonstersToGameFormatWithDBSkills } from "@/lib/utils/monster-converter"
 import type { MonsterWithStats } from "@/lib/types/database"
-import type { DbSkill, DbBuff } from "@/lib/types/database"
+import type { DbSkill, DbBuff, GachaResult } from "@/lib/types/database"
 import { getAllSkillsAndBuffs } from "@/lib/skills/skills-service"
+import { performGachaWithPity, getPityCount, getUserPoints, getGachaRates } from "@/lib/supabase/gacha-service"
 
 interface GameStore {
   // Collection management
@@ -35,6 +36,16 @@ interface GameStore {
 
   // Gacha system
   performGachaPull: () => Monster
+  performGachaPullFromDB: () => Promise<Monster>
+  
+  // Gacha state
+  userPoints: number
+  pityCount: { rare: number; unique: number }
+  gachaRates: { common: number; rare: number; unique: number }
+  gachaRateConfigs: DbGachaRate[] // DB에서 가져온 원본 설정 (guaranteed_count 포함)
+  isLoadingGacha: boolean
+  gachaError: string | null
+  loadGachaData: () => Promise<void>
 
   // Game state management
   phase: "menu" | "collection" | "monster-select" | "battle" | "result"
@@ -118,6 +129,14 @@ export const useGameStore = create<GameStore>()(
       isLoadingSkills: false,
       skillsError: null,
       
+      // Gacha system
+      userPoints: 0,
+      pityCount: { rare: 0, unique: 0 },
+      gachaRates: { common: 0.7, rare: 0.25, unique: 0.05 }, // 기본값
+      gachaRateConfigs: [], // DB 원본 설정
+      isLoadingGacha: false,
+      gachaError: null,
+      
       // Pokémon Rogue-like stats
       defeatedEnemies: 0,
       currentWinStreak: 0,
@@ -139,6 +158,86 @@ export const useGameStore = create<GameStore>()(
         const newMonster = performGacha()
         get().addToCollection(newMonster)
         return newMonster
+      },
+
+      performGachaPullFromDB: async () => {
+        set({ isLoadingGacha: true, gachaError: null })
+        
+        try {
+          const gachaResult = await performGachaWithPity()
+          
+          // DB 몬스터를 게임 몬스터로 변환
+          const gameMonster = convertMonsterWithStats({
+            monster: gachaResult.monster,
+            stats: gachaResult.stats
+          })
+          
+          // 컬렉션에 추가
+          get().addToCollection(gameMonster)
+          
+          // 가챠 상태 업데이트
+          set({
+            userPoints: gachaResult.remainedPoints,
+            pityCount: { rare: gachaResult.pityCount, unique: gachaResult.pityCount },
+            isLoadingGacha: false
+          })
+          
+          console.log(`가챠 성공: ${gachaResult.monster.name} (천장: ${gachaResult.wasGuaranteed ? '적용' : '미적용'})`)
+          
+          return gameMonster
+        } catch (error) {
+          console.error('가챠 실패:', error)
+          set({
+            isLoadingGacha: false,
+            gachaError: error instanceof Error ? error.message : 'Failed to perform gacha'
+          })
+          throw error
+        }
+      },
+      
+      loadGachaData: async () => {
+        set({ isLoadingGacha: true, gachaError: null })
+        
+        try {
+          const [points, pityCount, dbGachaRates] = await Promise.all([
+            getUserPoints(),
+            getPityCount(),
+            getGachaRates()
+          ])
+          
+          // DB 가챠 확률을 객체로 변환
+          const gachaRates = { common: 0.7, rare: 0.25, unique: 0.05 } // 기본값
+          
+          dbGachaRates.forEach(rate => {
+            const rarity = rate.rarity.toUpperCase()
+            if (rarity === "COMMON") {
+              gachaRates.common = rate.rate
+            } else if (rarity === "RARE") {
+              gachaRates.rare = rate.rate
+            } else if (rarity === "UNIQUE") {
+              gachaRates.unique = rate.rate
+            }
+          })
+          
+          set({
+            userPoints: points,
+            pityCount: pityCount,
+            gachaRates: gachaRates,
+            gachaRateConfigs: dbGachaRates, // DB 원본 설정 저장
+            isLoadingGacha: false
+          })
+          
+          console.log(`가챠 데이터 로딩 완료:`)
+          console.log(`  - 포인트: ${points}`)
+          console.log(`  - 천장 카운트: rare ${pityCount.rare}, unique ${pityCount.unique}`)
+          console.log(`  - 확률: 일반 ${(gachaRates.common * 100).toFixed(1)}%, 희귀 ${(gachaRates.rare * 100).toFixed(1)}%, 유니크 ${(gachaRates.unique * 100).toFixed(1)}%`)
+        } catch (error) {
+          console.error('가챠 데이터 로딩 실패:', error)
+          set({
+            isLoadingGacha: false,
+            gachaError: 'Failed to load gacha data'
+          })
+        }
       },
       
       loadSkillsFromSupabase: async () => {
