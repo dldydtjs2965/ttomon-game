@@ -10,7 +10,7 @@ import { AuthDialog } from "@/components/auth/auth-dialog"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useGameStore } from "@/hooks/use-game-store"
 import type { Monster } from "@/lib/monsters"
-import { Swords, Trophy, Sparkles, LogIn, LogOut, User, Construction } from "lucide-react"
+import { Trophy, Sparkles, LogIn, LogOut, User } from "lucide-react"
 
 export default function HomePage() {
   const { collection } = useGameStore()
@@ -99,7 +99,7 @@ export default function HomePage() {
           <Alert className="max-w-6xl mx-auto mb-6 border-amber-200 bg-amber-50 dark:bg-amber-950/20">
             <Sparkles className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800 dark:text-amber-200">
-              <strong>데모 모드</strong> - 현재 샘플 몬스터로 게임을 체험 중입니다. 
+              <strong>데모 모드</strong> - 현재 샘플 몬스터로 게임을 체험 중입니다.
               로그인하면 실제 몬스터를 수집하고 저장할 수 있습니다!
             </AlertDescription>
           </Alert>
@@ -126,50 +126,20 @@ export default function HomePage() {
                   </CardHeader>
                   <CardContent className="text-center space-y-4">
                     <p className="text-muted-foreground">
-                    로그인하여 또몬을 수집하고 컬렉션을 관리하세요!
-                  </p>
-                  <Button onClick={handleSignIn} className="w-full">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    로그인하여 시작하기
-                  </Button>
-                </CardContent>
-              </Card>
+                      로그인하여 또몬을 수집하고 컬렉션을 관리하세요!
+                    </p>
+                    <Button onClick={handleSignIn} className="w-full">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      로그인하여 시작하기
+                    </Button>
+                  </CardContent>
+                </Card>
               </>
             )}
           </div>
 
-          {/* Right Column - Battle Setup (Disabled) & Stats */}
+          {/* Right Column - Stats & Coming Soon */}
           <div className="space-y-6">
-            {/* Battle Section - Disabled */}
-            <Card className="opacity-60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Construction className="w-5 h-5" />
-                  배틀 시스템
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Alert>
-                  <Construction className="h-4 w-4" />
-                  <AlertDescription>
-                    배틀 시스템은 현재 개발 중입니다. 곧 만나보실 수 있습니다!
-                  </AlertDescription>
-                </Alert>
-                
-                <div className="text-sm text-muted-foreground">
-                  <p>• 1대1 턴제 배틀</p>
-                  <p>• 스킬 시스템 및 쿨다운</p>
-                  <p>• 회피 및 방어 시스템</p>
-                  <p>• 야생 또몬과의 대전</p>
-                </div>
-
-                <Button disabled className="w-full" size="lg">
-                  <Swords className="w-4 h-4 mr-2" />
-                  배틀 준비 중...
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Game Stats */}
             <Card>
               <CardHeader>
@@ -212,9 +182,7 @@ export default function HomePage() {
                 <CardTitle className="text-sm">업데이트 예정</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>🔥 배틀 시스템 (턴제 전략 배틀)</p>
                 <p>🏆 랭킹 시스템 (전국 랭킹)</p>
-                <p>🎮 PvP 대전 (실시간 대전)</p>
                 <p>🌟 또몬 진화 시스템</p>
                 <p>🎁 일일 미션 및 보상</p>
               </CardContent>
