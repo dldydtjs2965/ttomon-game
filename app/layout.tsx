@@ -6,8 +6,8 @@ import { AuthProvider } from '@/components/auth/auth-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '또몬 배틀 게임',
-  description: '또몬을 수집하고 배틀하는 턴제 전략 게임',
+  title: '하루 한 줄',
+  description: '작은 한 줄이 모여 하나의 이야기가 되는 ',
   generator: 'v0.app',
 }
 

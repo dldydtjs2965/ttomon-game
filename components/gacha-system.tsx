@@ -13,7 +13,7 @@ export function GachaSystem() {
   const [isOpen, setIsOpen] = useState(false)
   const [pulledMonster, setPulledMonster] = useState<Monster | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
-  
+
   // DB 연동 가챠 사용
   const {
     performGachaPullFromDB,
@@ -25,7 +25,7 @@ export function GachaSystem() {
     gachaError,
     loadGachaData
   } = useGameStore()
-  
+
   // 컴포넌트 마운트 시 가챠 데이터 로딩
   useEffect(() => {
     loadGachaData()
@@ -118,11 +118,11 @@ export function GachaSystem() {
                 })()}
               </div>
             </div>
-            
+
             <p className="text-sm text-muted-foreground">
               새로운 몬스터를 뽑아보세요! (30P)
             </p>
-            
+
             <div className="flex justify-center gap-2 text-xs">
               <span className="flex items-center gap-1">
                 <div className="w-3 h-3 bg-gray-500 rounded"></div>
@@ -139,10 +139,10 @@ export function GachaSystem() {
             </div>
           </div>
 
-          <Button 
-            onClick={handleGachaPull} 
-            disabled={isAnimating || isLoadingGacha || userPoints < 30} 
-            className="w-full" 
+          <Button
+            onClick={handleGachaPull}
+            disabled={isAnimating || isLoadingGacha || userPoints < 30}
+            className="w-full"
             size="lg"
           >
             {isAnimating ? (
@@ -162,7 +162,7 @@ export function GachaSystem() {
               </div>
             )}
           </Button>
-          
+
           {gachaError && (
             <p className="text-red-500 text-sm text-center">{gachaError}</p>
           )}
@@ -192,13 +192,6 @@ export function GachaSystem() {
 
               <div className="text-center space-y-2">
                 <h3 className="text-xl font-bold">{pulledMonster.name}</h3>
-                <div className="flex justify-center gap-4 text-sm">
-                  <span>체력: {pulledMonster.hp || pulledMonster.maxHp || 0}</span>
-                  <span>공격력: {pulledMonster.attack || 0}</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  스킬: {pulledMonster.skills?.[0]?.name || pulledMonster.skill?.name || "없음"}
-                </p>
               </div>
 
               <Button onClick={() => setIsOpen(false)} className="w-full">

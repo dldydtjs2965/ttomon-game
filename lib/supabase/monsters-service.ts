@@ -1,21 +1,15 @@
 import { createClient } from "@/lib/supabase/client";
 import type {
-	DbMonster,
-	DbMonsterStats,
-	DbUserMonster,
-	DbUserProfile,
 	MonsterWithStats,
-	UserMonsterWithDetails,
 } from "@/lib/types/database";
 
 /**
- * 모든 몬스터와 스탯 정보를 가져옵니다 (마스터 데이터)
+ * 모든 몬스터 정보를 가져옵니다 (마스터 데이터)
  */
 export async function getAllMonstersWithStats(): Promise<MonsterWithStats[]> {
 	const supabase = createClient();
 
 	try {
-		// monsters 테이블과 monster_stats 테이블을 조인
 		const { data: monsters, error: monstersError } = await supabase
 			.from("monsters")
 			.select("*")
@@ -26,30 +20,18 @@ export async function getAllMonstersWithStats(): Promise<MonsterWithStats[]> {
 			throw monstersError;
 		}
 
-		const { data: stats, error: statsError } = await supabase
-			.from("monster_stats")
-			.select("*");
-
-		if (statsError) {
-			console.error("Error fetching monster stats:", statsError);
-			throw statsError;
-		}
-
-		// 몬스터와 스탯을 매칭
+		// 몬스터 데이터만 반환
 		const monstersWithStats: MonsterWithStats[] = (monsters || []).map(
 			(monster) => {
-				const monsterStats =
-					stats?.find((s) => s.monster_id === monster.id) || null;
 				return {
 					monster,
-					stats: monsterStats,
 				};
 			},
 		);
 
 		return monstersWithStats;
 	} catch (error) {
-		console.error("Failed to fetch monsters with stats:", error);
+		console.error("Failed to fetch monsters:", error);
 		return [];
 	}
 }
@@ -74,20 +56,8 @@ export async function getMonsterById(
 			return null;
 		}
 
-		const { data: stats, error: statsError } = await supabase
-			.from("monster_stats")
-			.select("*")
-			.eq("monster_id", monsterId)
-			.single();
-
-		if (statsError && statsError.code !== "PGRST116") {
-			// PGRST116: no rows found
-			console.error("Error fetching monster stats:", statsError);
-		}
-
 		return {
 			monster,
-			stats: stats || null,
 		};
 	} catch (error) {
 		console.error("Failed to fetch monster by id:", error);
@@ -160,25 +130,12 @@ export async function getCurrentUserMonsters(): Promise<
 			throw monstersError;
 		}
 
-		// 몬스터 스탯 조회
-		const { data: stats, error: statsError } = await supabase
-			.from("monster_stats")
-			.select("*")
-			.in("monster_id", monsterIds);
-
-		if (statsError) {
-			console.error("Error fetching monster stats:", statsError);
-			throw statsError;
-		}
-
 		// 데이터 조합
 		const result: UserMonsterWithDetails[] = userMonsters
 			.filter((um) => um.monster_id !== null)
 			.map((userMonster) => {
 				const monster =
 					monsters?.find((m) => m.id === userMonster.monster_id) || null;
-				const monsterStats =
-					stats?.find((s) => s.monster_id === userMonster.monster_id) || null;
 
 				if (!monster) {
 					return null;
@@ -187,7 +144,6 @@ export async function getCurrentUserMonsters(): Promise<
 				return {
 					userMonster,
 					monster,
-					stats: monsterStats,
 				};
 			})
 			.filter((item): item is UserMonsterWithDetails => item !== null);

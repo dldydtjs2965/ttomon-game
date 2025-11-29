@@ -1,11 +1,7 @@
 import { createClient } from "@/lib/supabase/client"
 import type { 
-  DbGachaRate, 
-  DbGachaHistory, 
+  DbGachaRate,  
   GachaResult, 
-  DbMonster, 
-  DbMonsterStats, 
-  DbUserMonster,
   MonsterWithStats 
 } from "@/lib/types/database"
 
@@ -190,21 +186,8 @@ async function selectRandomMonsterByRarity(rarity: string): Promise<MonsterWithS
     
     console.log(`Selected monster: ${selectedMonster.name} (ID: ${selectedMonster.id}) from ${monsters.length} ${rarity} monsters`)
     
-    // 3. 선택된 몬스터의 스탯 조회
-    const { data: stats, error: statsError } = await supabase
-      .from("monster_stats")
-      .select("*")
-      .eq("monster_id", selectedMonster.id)
-      .maybeSingle()
-
-    if (statsError && statsError.code !== "PGRST116") {
-      // PGRST116: no rows found - 스탯이 없어도 계속 진행
-      console.warn(`Failed to fetch stats for monster ${selectedMonster.id}:`, statsError.message)
-    }
-    
     return {
       monster: selectedMonster,
-      stats: stats || null
     }
   } catch (error) {
     console.error(`Error selecting monster by rarity ${rarity}:`, error)
@@ -319,7 +302,6 @@ export async function performGachaWithPity(): Promise<GachaResult> {
 
     return {
       monster: selectedMonster.monster,
-      stats: selectedMonster.stats,
       usedPoints: gachaCost,
       remainedPoints,
       wasGuaranteed,

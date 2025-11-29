@@ -26,24 +26,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = createClient()
-  const { loadMonstersFromSupabase, loadUserMonsters, loadDemoCollection } = useGameStore()
+  const { loadCollection } = useGameStore()
 
   useEffect(() => {
-    // Load master monster data on app start
-    loadMonstersFromSupabase().then(() => {
-      // After loading master data, check if user is logged in
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null)
-        setIsLoading(false)
-        
-        if (session?.user) {
-          // Load user monsters if authenticated
-          loadUserMonsters()
-        } else {
-          // Load demo collection for non-authenticated users
-          loadDemoCollection().catch(console.error)
-        }
-      })
+    // Check session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setIsLoading(false)
+
+      if (session?.user) {
+        // Load user collection if authenticated
+        loadCollection()
+      }
     })
 
     // Listen for auth changes
@@ -52,18 +46,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setIsLoading(false)
-      
+
       if (session?.user) {
-        // Load user monsters when user logs in
-        loadUserMonsters()
+        // Load user collection when user logs in
+        loadCollection()
       } else {
-        // Load demo collection when user logs out
-        loadDemoCollection().catch(console.error)
+        // Clear collection or handle logout state if needed
+        // For now, we just let the store handle it (it might need a clear action, but loadCollection handles fetch)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase, loadMonstersFromSupabase, loadUserMonsters, loadDemoCollection])
+  }, [supabase, loadCollection])
 
   const signOut = async () => {
     await supabase.auth.signOut()

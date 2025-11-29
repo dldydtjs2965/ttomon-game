@@ -79,7 +79,7 @@ export function PetCollection({ onSelectMonsters, selectionMode = false, maxSele
       return null
     }
 
-    if (!monster.name || !monster.skills || !Array.isArray(monster.skills)) {
+    if (!monster.name) {
       console.error("[v0] Invalid monster data:", monster)
       return (
         <Card className="cursor-not-allowed opacity-50">
@@ -91,17 +91,15 @@ export function PetCollection({ onSelectMonsters, selectionMode = false, maxSele
     }
 
     const isSelected = selectedMonsters.some((m) => m?.id === monster.id)
-    const firstSkill = monster.skills[0]
 
     return (
       <Card
-        className={`cursor-pointer transition-all hover:scale-105 ${
-          selectionMode
-            ? isSelected
-              ? "ring-2 ring-primary bg-primary/10"
-              : "hover:ring-1 hover:ring-primary/50"
-            : "hover:shadow-lg"
-        }`}
+        className={`cursor-pointer transition-all hover:scale-105 ${selectionMode
+          ? isSelected
+            ? "ring-2 ring-primary bg-primary/10"
+            : "hover:ring-1 hover:ring-primary/50"
+          : "hover:shadow-lg"
+          }`}
         onClick={() => handleMonsterSelect(monster)}
       >
         <CardContent className="p-3">
@@ -115,21 +113,7 @@ export function PetCollection({ onSelectMonsters, selectionMode = false, maxSele
           </div>
 
           <div className="space-y-1">
-            <h4 className="font-semibold text-sm truncate">{monster.name}</h4>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Heart className="w-3 h-3" />
-                {monster.hp || monster.maxHp || 0}
-              </div>
-              <div className="flex items-center gap-1">
-                <Zap className="w-3 h-3" />
-                {monster.attack || 0}
-              </div>
-            </div>
-            <div className="flex items-center gap-1 text-xs">
-              <Shield className="w-3 h-3" />
-              <span className="truncate">{firstSkill?.name || "스킬 없음"}</span>
-            </div>
+            <h4 className="font-semibold text-sm truncate text-center">{monster.name}</h4>
           </div>
         </CardContent>
       </Card>
@@ -138,7 +122,7 @@ export function PetCollection({ onSelectMonsters, selectionMode = false, maxSele
 
   const validCollection = collection.filter(
     (monster) =>
-      monster && typeof monster === "object" && monster.name && monster.skills && Array.isArray(monster.skills),
+      monster && typeof monster === "object" && monster.name,
   )
 
   if (selectionMode) {

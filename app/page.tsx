@@ -9,19 +9,13 @@ import { PetCollection } from "@/components/pet-collection"
 import { AuthDialog } from "@/components/auth/auth-dialog"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useGameStore } from "@/hooks/use-game-store"
-import type { Monster } from "@/lib/monsters"
 import { Trophy, Sparkles, LogIn, LogOut, User } from "lucide-react"
 
 export default function HomePage() {
   const { collection } = useGameStore()
   const { user, isAuthenticated, isLoading, signOut } = useAuth()
-  const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([])
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
-
-  const handleMonstersSelected = (monsters: Monster[]) => {
-    setSelectedMonsters(monsters)
-  }
 
   const handleSignIn = () => {
     setAuthMode('signin')
@@ -61,9 +55,9 @@ export default function HomePage() {
         <div className="flex justify-between items-center mb-8">
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              또몬 배틀 게임
+              하루 한 줄
             </h1>
-            <p className="text-muted-foreground">또몬을 수집하고 컬렉션을 완성하세요!</p>
+            <p className="text-muted-foreground">한 줄이 모여 하나의 이야기가 되는 </p>
           </div>
 
           {/* Auth Buttons */}
@@ -182,8 +176,7 @@ export default function HomePage() {
                 <CardTitle className="text-sm">업데이트 예정</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>🏆 랭킹 시스템 (전국 랭킹)</p>
-                <p>🌟 또몬 진화 시스템</p>
+                <p>🏆 랭킹 시스템 (수집 랭킹)</p>
                 <p>🎁 일일 미션 및 보상</p>
               </CardContent>
             </Card>
