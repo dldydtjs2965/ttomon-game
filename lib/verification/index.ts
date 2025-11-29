@@ -47,4 +47,4 @@ export {
 } from "./mock-data"
 
 // Service
-export { verificationService, mockVerificationService } from "./verification-service"
+export { verificationService, mockVerificationService } from "@/lib/api/verification"

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client"
+import { createBrowserSupabase } from "@/lib/supabase/browser"
 import type { 
   DbGachaRate,  
   GachaResult, 
@@ -24,7 +24,7 @@ export async function getGachaRates(): Promise<DbGachaRate[]> {
   
   // 캐시가 없거나 만료된 경우 DB에서 조회
   console.log("가챠 확률 DB 조회 중")
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   const { data, error } = await supabase
     .from("gacha_rates")
@@ -52,7 +52,7 @@ export async function getGachaRates(): Promise<DbGachaRate[]> {
  * 유저의 천장 카운트 조회 (마지막 희귀/유니크 이후 뽑기 횟수)
  */
 export async function getPityCount(): Promise<{ rare: number; unique: number }> {
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   try {
     // 현재 유저 정보 가져오기
@@ -162,7 +162,7 @@ export async function getPityCount(): Promise<{ rare: number; unique: number }> 
  * 분리된 쿼리 방식으로 관계 쿼리 오류 방지
  */
 async function selectRandomMonsterByRarity(rarity: string): Promise<MonsterWithStats | null> {
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   try {
     // 1. 해당 레어도의 몬스터 조회 (대문자 레어도 기준)
@@ -199,7 +199,7 @@ async function selectRandomMonsterByRarity(rarity: string): Promise<MonsterWithS
  * 천장 시스템이 적용된 가챠 수행
  */
 export async function performGachaWithPity(): Promise<GachaResult> {
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   try {
     // 1. 현재 유저 확인
@@ -318,7 +318,7 @@ export async function performGachaWithPity(): Promise<GachaResult> {
  * 유저 몬스터 업데이트 또는 추가
  */
 async function updateUserMonster(userId: number, monsterId: number): Promise<void> {
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   // 기존 유저 몬스터 확인
   const { data: existing, error: selectError } = await supabase
@@ -362,7 +362,7 @@ async function updateUserMonster(userId: number, monsterId: number): Promise<voi
  * 유저의 현재 포인트 조회
  */
 export async function getUserPoints(): Promise<number> {
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser()

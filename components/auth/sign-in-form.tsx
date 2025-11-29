@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createClient } from "@/lib/supabase/client"
+import { createBrowserSupabase } from "@/lib/supabase/browser"
 import { Loader2, Mail, Lock } from "lucide-react"
 
 interface SignInFormProps {
@@ -25,7 +25,7 @@ export function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
     setError(null)
 
     try {
-      const supabase = createClient()
+      const supabase = createBrowserSupabase()
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,

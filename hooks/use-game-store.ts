@@ -1,14 +1,14 @@
 import { create } from 'zustand'
-import { 
-  getCurrentUserMonsters, 
-  getAllMonstersWithStats 
-} from '@/lib/supabase/monsters-service'
-import { 
-  getGachaRates, 
-  getPityCount, 
-  performGachaWithPity, 
-  getUserPoints 
-} from '@/lib/supabase/gacha-service'
+import {
+  getCurrentUserMonsters,
+  getAllMonstersWithStats
+} from '@/lib/api/monsters'
+import {
+  getGachaRates,
+  getPityCount,
+  performGachaWithPity,
+  getUserPoints
+} from '@/lib/api/gacha'
 import type { 
   MonsterWithStats, 
   UserMonsterWithDetails, 

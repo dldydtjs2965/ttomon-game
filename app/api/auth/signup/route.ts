@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase/service'
+import { createAdminSupabase } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -12,8 +12,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // 서비스 클라이언트로 RLS 우회하여 업데이트
-    const supabase = createServiceClient()
+    // Admin 클라이언트로 RLS 우회하여 업데이트
+    const supabase = createAdminSupabase()
     
     console.log('Updating profile with service key:', { userId, profileId })
     

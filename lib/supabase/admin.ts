@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-export function createServiceClient() {
+export function createAdminSupabase() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
     throw new Error("Supabase URL 또는 Service Key가 설정되어 있지 않습니다.");
   }

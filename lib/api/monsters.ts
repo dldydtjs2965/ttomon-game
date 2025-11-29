@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { createBrowserSupabase } from "@/lib/supabase/browser";
 import type {
 	MonsterWithStats,
 } from "@/lib/types/database";
@@ -7,7 +7,7 @@ import type {
  * 모든 몬스터 정보를 가져옵니다 (마스터 데이터)
  */
 export async function getAllMonstersWithStats(): Promise<MonsterWithStats[]> {
-	const supabase = createClient();
+	const supabase = createBrowserSupabase();
 
 	try {
 		const { data: monsters, error: monstersError } = await supabase
@@ -42,7 +42,7 @@ export async function getAllMonstersWithStats(): Promise<MonsterWithStats[]> {
 export async function getMonsterById(
 	monsterId: number,
 ): Promise<MonsterWithStats | null> {
-	const supabase = createClient();
+	const supabase = createBrowserSupabase();
 
 	try {
 		const { data: monster, error: monsterError } = await supabase
@@ -71,7 +71,7 @@ export async function getMonsterById(
 export async function getCurrentUserMonsters(): Promise<
 	UserMonsterWithDetails[]
 > {
-	const supabase = createClient();
+	const supabase = createBrowserSupabase();
 
 	try {
 		// 현재 인증된 사용자 확인
@@ -159,7 +159,7 @@ export async function getCurrentUserMonsters(): Promise<
  * 현재 인증된 사용자의 프로필을 가져옵니다
  */
 export async function getCurrentUserProfile(): Promise<DbUserProfile | null> {
-	const supabase = createClient();
+	const supabase = createBrowserSupabase();
 
 	try {
 		// 현재 인증된 사용자 확인
@@ -217,7 +217,7 @@ export async function debugUserProfile(): Promise<{
 	profileData: DbUserProfile | null;
 	error: string | null;
 }> {
-	const supabase = createClient();
+	const supabase = createBrowserSupabase();
 
 	try {
 		// 인증 상태 확인

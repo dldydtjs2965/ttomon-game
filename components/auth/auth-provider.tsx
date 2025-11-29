@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { User } from "@supabase/supabase-js"
-import { createClient } from "@/lib/supabase/client"
+import { createBrowserSupabase } from "@/lib/supabase/browser"
 import { useGameStore } from "@/hooks/use-game-store"
 
 interface AuthContextType {
@@ -25,7 +25,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
   const { loadCollection } = useGameStore()
 
   useEffect(() => {

@@ -34,9 +34,9 @@ export function WeekCell({
 
   // opacity 값을 변수로 정의
   const opacityMap: Record<0 | 1 | 2 | 3, number> = {
-    0: 0.15,  // 빈색
-    1: 0.35,  // 연함
-    2: 0.6,   // 중간
+    0: 0.4,   // 연한 회색
+    1: 0.6,  // 연함
+    2: 0.8,   // 중간
     3: 1,     // 진함
   }
 

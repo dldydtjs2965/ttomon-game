@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createClient } from "@/lib/supabase/client"
+import { createBrowserSupabase } from "@/lib/supabase/browser"
 import { Loader2, Mail, Lock, User, Check, X } from "lucide-react"
 
 interface SignUpFormProps {
@@ -92,7 +92,7 @@ export function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
 
     try {
       // 클라이언트에서 직접 회원가입 처리 (자동 로그인을 위해)
-      const supabase = createClient()
+      const supabase = createBrowserSupabase()
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,

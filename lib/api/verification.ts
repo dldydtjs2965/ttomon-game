@@ -1,6 +1,6 @@
-import type { DailyVerification, WeekSummary, StreakInfo, VerificationService } from "./types"
-import { MOCK_VERIFICATIONS } from "./mock-data"
-import { generateWeeklySummaries, calculateStreak } from "./utils"
+import type { DailyVerification, WeekSummary, StreakInfo, VerificationService } from "@/lib/verification/types"
+import { MOCK_VERIFICATIONS } from "@/lib/verification/mock-data"
+import { generateWeeklySummaries, calculateStreak } from "@/lib/verification/utils"
 
 /**
  * Mock 인증 서비스 구현
