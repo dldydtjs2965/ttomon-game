@@ -4,7 +4,7 @@ export type {
   WeekSummary,
   StreakInfo,
   VerificationData,
-  VerificationService,
+  VerificationApi,
   // 기수별 히트맵 타입
   CohortInfo,
   CohortMember,
@@ -46,5 +46,5 @@ export {
   getMockCohortHeatmapResponse,
 } from "./mock-data"
 
-// Service
-export { verificationService, mockVerificationService } from "@/lib/api/verification"
+// API
+export { verificationApi, mockVerificationApi } from "@/lib/api/verification"

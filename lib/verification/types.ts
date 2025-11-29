@@ -33,8 +33,8 @@ export interface VerificationData {
   currentWeekCount: number
 }
 
-/** 인증 서비스 인터페이스 (추후 실제 구현으로 교체 가능) */
-export interface VerificationService {
+/** 인증 API 인터페이스 (추후 실제 구현으로 교체 가능) */
+export interface VerificationApi {
   getVerifications(userId: string, weeks: number): Promise<DailyVerification[]>
   getWeeklySummaries(userId: string, weeks: number): Promise<WeekSummary[]>
   getStreakInfo(userId: string): Promise<StreakInfo>

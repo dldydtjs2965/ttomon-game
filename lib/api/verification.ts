@@ -1,12 +1,12 @@
-import type { DailyVerification, WeekSummary, StreakInfo, VerificationService } from "@/lib/verification/types"
+import type { DailyVerification, WeekSummary, StreakInfo, VerificationApi } from "@/lib/verification/types"
 import { MOCK_VERIFICATIONS } from "@/lib/verification/mock-data"
 import { generateWeeklySummaries, calculateStreak } from "@/lib/verification/utils"
 
 /**
- * Mock 인증 서비스 구현
+ * Mock 인증 API 구현
  * 실제 Supabase 연동 시 이 구현을 교체
  */
-export const mockVerificationService: VerificationService = {
+export const mockVerificationApi: VerificationApi = {
   async getVerifications(
     _userId: string,
     weeks: number = 12
@@ -37,19 +37,19 @@ export const mockVerificationService: VerificationService = {
 }
 
 /**
- * 현재 활성화된 서비스
- * TODO: 실제 Supabase 연동 시 supabaseVerificationService로 교체
+ * 현재 활성화된 API
+ * TODO: 실제 Supabase 연동 시 supabaseVerificationApi로 교체
  */
-export const verificationService = mockVerificationService
+export const verificationApi = mockVerificationApi
 
 /**
- * Supabase 연동용 서비스 템플릿 (추후 구현)
+ * Supabase 연동용 API 템플릿 (추후 구현)
  *
- * import { createClient } from "@/lib/supabase/client"
+ * import { createBrowserSupabase } from "@/lib/supabase/browser"
  *
- * export const supabaseVerificationService: VerificationService = {
+ * export const supabaseVerificationApi: VerificationApi = {
  *   async getVerifications(userId: string, weeks: number): Promise<DailyVerification[]> {
- *     const supabase = createClient()
+ *     const supabase = createBrowserSupabase()
  *     const startDate = new Date()
  *     startDate.setDate(startDate.getDate() - weeks * 7)
  *

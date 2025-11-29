@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import {
-  verificationService,
+  verificationApi,
   generateWeeklySummaries,
   calculateStreak,
   getCurrentWeekCount,
@@ -49,7 +49,7 @@ export function useVerificationData(
       setError(null)
 
       // 인증 데이터 가져오기
-      const fetchedVerifications = await verificationService.getVerifications(
+      const fetchedVerifications = await verificationApi.getVerifications(
         userId,
         weeks
       )
