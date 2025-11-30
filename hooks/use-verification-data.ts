@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useQuery } from "@tanstack/react-query"
 import {
-  verificationApi,
-  generateWeeklySummaries,
-  calculateStreak,
-  getCurrentWeekCount,
+  verificationQueryOptions,
+} from "@/lib/api/query-options"
+import {
   checkTodayVerified,
+  getCurrentWeekCount,
 } from "@/lib/verification"
 import { getMockCohortHeatmapResponse } from "@/lib/verification/mock-data"
 import type {
@@ -16,6 +16,7 @@ import type {
   StreakInfo,
   CohortHeatmapResponse,
 } from "@/lib/verification"
+import { useState, useCallback, useEffect } from "react"
 
 interface UseVerificationDataOptions {
   weeks?: number
@@ -33,50 +34,44 @@ export function useVerificationData(
 ): UseVerificationDataReturn {
   const { weeks = 12, userId = "mock-user" } = options
 
-  const [verifications, setVerifications] = useState<DailyVerification[]>([])
-  const [weeklySummaries, setWeeklySummaries] = useState<WeekSummary[]>([])
-  const [streak, setStreak] = useState<StreakInfo>({
-    currentStreak: 0,
-    longestStreak: 0,
-    isActive: false,
-  })
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  // 1. 인증 데이터 쿼리
+  const { 
+    data: verifications = [], 
+    isLoading: isLoadingVerifications,
+    error: verificationError,
+    refetch: refetchVerifications
+  } = useQuery(verificationQueryOptions.list(userId, weeks))
 
-  const fetchData = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
+  // 2. 주간 요약 쿼리
+  const { 
+    data: weeklySummaries = [], 
+    isLoading: isLoadingSummaries,
+    error: summaryError,
+    refetch: refetchSummaries
+  } = useQuery(verificationQueryOptions.summary(userId, weeks))
 
-      // 인증 데이터 가져오기
-      const fetchedVerifications = await verificationApi.getVerifications(
-        userId,
-        weeks
-      )
-      setVerifications(fetchedVerifications)
-
-      // 주간 요약 계산
-      const summaries = generateWeeklySummaries(fetchedVerifications, weeks)
-      setWeeklySummaries(summaries)
-
-      // 스트릭 계산
-      const streakInfo = calculateStreak(summaries)
-      setStreak(streakInfo)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch data"))
-      console.error("[Verification] Error fetching data:", err)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [userId, weeks])
-
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
+  // 3. 스트릭 정보 쿼리
+  const { 
+    data: streak = { currentStreak: 0, longestStreak: 0, isActive: false }, 
+    isLoading: isLoadingStreak,
+    error: streakError,
+    refetch: refetchStreak
+  } = useQuery(verificationQueryOptions.streak(userId))
 
   // 파생 상태 계산
   const todayVerified = checkTodayVerified(verifications)
   const currentWeekCount = getCurrentWeekCount(verifications)
+
+  const handleRefetch = async () => {
+    await Promise.all([
+      refetchVerifications(),
+      refetchSummaries(),
+      refetchStreak()
+    ])
+  }
+
+  const isLoading = isLoadingVerifications || isLoadingSummaries || isLoadingStreak
+  const error = (verificationError || summaryError || streakError) as Error | null
 
   return {
     verifications,
@@ -86,7 +81,7 @@ export function useVerificationData(
     currentWeekCount,
     isLoading,
     error,
-    refetch: fetchData,
+    refetch: handleRefetch,
   }
 }
 
