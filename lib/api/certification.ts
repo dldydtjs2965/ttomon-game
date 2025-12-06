@@ -1,6 +1,74 @@
-import type { DailyCertification, WeekSummary, StreakInfo, CertificationApi } from "@/lib/certification/types"
+import type { DailyCertification, WeekSummary, StreakInfo, CertificationApi, Certification } from "@/lib/certification/types"
+import type { DbCertification } from "@/lib/types/database"
 import { MOCK_CERTIFICATIONS } from "@/lib/certification/mock-data"
 import { generateWeeklySummaries, calculateStreak } from "@/lib/certification/utils"
+
+/**
+ * DB 인증 데이터를 프론트엔드 타입으로 변환
+ */
+function mapDbCertification(db: DbCertification): Certification {
+  return {
+    id: db.id,
+    createdAt: db.created_at,
+    updatedAt: db.updated_at,
+    seasonId: db.season_id,
+    userId: db.user_id,
+    weekNumber: db.week_number,
+    content: db.content,
+    certificationDate: db.certification_date,
+  }
+}
+
+/**
+ * 주차별 인증 데이터 조회 (API 호출)
+ */
+export async function fetchCertificationsByWeek(
+  userId: string,
+  weekNumber: number,
+  seasonId?: number
+): Promise<Certification[]> {
+  const params = new URLSearchParams({
+    userId,
+    weekNumber: weekNumber.toString(),
+  })
+
+  if (seasonId) {
+    params.append('seasonId', seasonId.toString())
+  }
+
+  const response = await fetch(`/api/certification?${params.toString()}`)
+
+  if (!response.ok) {
+    throw new Error('인증 데이터를 가져오는데 실패했습니다.')
+  }
+
+  const data = await response.json()
+  return (data.certifications as DbCertification[]).map(mapDbCertification)
+}
+
+/**
+ * 유저의 전체 인증 데이터 조회 (API 호출)
+ */
+export async function fetchCertifications(
+  userId: string,
+  seasonId?: number
+): Promise<Certification[]> {
+  const params = new URLSearchParams({ userId })
+
+  if (seasonId) {
+    params.append('seasonId', seasonId.toString())
+  }
+
+  const response = await fetch(`/api/certification?${params.toString()}`)
+
+  if (!response.ok) {
+    throw new Error('인증 데이터를 가져오는데 실패했습니다.')
+  }
+
+  const data = await response.json()
+
+  return (data.certifications as DbCertification[]).map(mapDbCertification)
+}
 
 /**
  * Mock 인증 API 구현
@@ -11,7 +79,6 @@ export const mockCertificationApi: CertificationApi = {
     _userId: string,
     weeks: number = 12
   ): Promise<DailyCertification[]> {
-    // 실제 구현 시: Supabase에서 해당 기간의 인증 데이터 조회
     const today = new Date()
     const startDate = new Date(today)
     startDate.setDate(startDate.getDate() - weeks * 7)
@@ -20,6 +87,14 @@ export const mockCertificationApi: CertificationApi = {
       const cDate = new Date(c.date)
       return cDate >= startDate && cDate <= today
     })
+  },
+
+  async getCertificationsByWeek(
+    userId: string,
+    weekNumber: number,
+    seasonId?: number
+  ): Promise<Certification[]> {
+    return fetchCertificationsByWeek(userId, weekNumber, seasonId)
   },
 
   async getWeeklySummaries(
@@ -31,42 +106,12 @@ export const mockCertificationApi: CertificationApi = {
   },
 
   async getStreakInfo(userId: string): Promise<StreakInfo> {
-    const summaries = await this.getWeeklySummaries(userId, 52) // 1년치로 계산
+    const summaries = await this.getWeeklySummaries(userId, 52)
     return calculateStreak(summaries)
   },
 }
 
 /**
  * 현재 활성화된 API
- * TODO: 실제 Supabase 연동 시 supabaseCertificationApi로 교체
  */
 export const certificationApi = mockCertificationApi
-
-/**
- * Supabase 연동용 API 템플릿 (추후 구현)
- *
- * import { createBrowserSupabase } from "@/lib/supabase/browser"
- *
- * export const supabaseCertificationApi: CertificationApi = {
- *   async getCertifications(userId: string, weeks: number): Promise<DailyCertification[]> {
- *     const supabase = createBrowserSupabase()
- *     const startDate = new Date()
- *     startDate.setDate(startDate.getDate() - weeks * 7)
- *
- *     const { data, error } = await supabase
- *       .from('daily_certifications')
- *       .select('date, verified, image_url')
- *       .eq('user_id', userId)
- *       .gte('date', startDate.toISOString().split('T')[0])
- *       .order('date', { ascending: false })
- *
- *     if (error) throw error
- *     return data.map(d => ({
- *       date: d.date,
- *       verified: d.verified,
- *       imageUrl: d.image_url
- *     }))
- *   },
- *   // ... 나머지 메서드 구현
- * }
- */

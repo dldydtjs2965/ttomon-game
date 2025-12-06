@@ -5,6 +5,7 @@ export type {
   StreakInfo,
   CertificationData,
   CertificationApi,
+  Certification,
   // 기수별 히트맵 타입
   CohortInfo,
   CohortMember,
@@ -47,4 +48,9 @@ export {
 } from "./mock-data"
 
 // API
-export { certificationApi, mockCertificationApi } from "@/lib/api/certification"
+export {
+  certificationApi,
+  mockCertificationApi,
+  fetchCertifications,
+  fetchCertificationsByWeek,
+} from "@/lib/api/certification"

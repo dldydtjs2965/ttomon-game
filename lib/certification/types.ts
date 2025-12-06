@@ -36,8 +36,21 @@ export interface CertificationData {
 /** 인증 API 인터페이스 (추후 실제 구현으로 교체 가능) */
 export interface CertificationApi {
   getCertifications(userId: string, weeks: number): Promise<DailyCertification[]>
+  getCertificationsByWeek(userId: string, weekNumber: number, seasonId?: number): Promise<Certification[]>
   getWeeklySummaries(userId: string, weeks: number): Promise<WeekSummary[]>
   getStreakInfo(userId: string): Promise<StreakInfo>
+}
+
+/** 인증 기록 (DB 기반) */
+export interface Certification {
+  id: number
+  createdAt: string
+  updatedAt: string | null
+  seasonId: number | null
+  userId: number | null
+  weekNumber: number | null
+  content: string | null
+  certificationDate: string | null // YYYY-MM-DD
 }
 
 // ============================================

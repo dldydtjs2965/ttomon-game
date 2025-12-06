@@ -43,6 +43,30 @@ export interface UserMonsterWithDetails {
   // stats removed
 }
 
+// Season System Tables
+export interface DbSeason {
+  id: number
+  created_at: string
+  updated_at: string | null
+  season_number: number | null
+  start_date: string | null // YYYY-MM-DD
+  end_date: string | null // YYYY-MM-DD
+  week_count: number | null
+  is_active: boolean | null
+}
+
+// Certification System Tables
+export interface DbCertification {
+  id: number
+  created_at: string
+  updated_at: string | null
+  season_id: number | null
+  user_id: number | null
+  week_number: number | null
+  content: string | null
+  certification_date: string | null // YYYY-MM-DD
+}
+
 // Gacha System Tables
 export interface DbGachaRate {
   id: number

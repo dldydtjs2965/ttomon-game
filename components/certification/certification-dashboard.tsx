@@ -5,20 +5,21 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { WeeklyProgressCard } from "./weekly-progress-card"
 import { CohortHeatmap } from "./cohort-heatmap"
-import { useCertificationData, useCohortHeatmap } from "@/hooks/use-certification-data"
+import { useCurrentWeekCertifications, useCohortHeatmap } from "@/hooks/use-certification-data"
 
-interface CerificationDashboardProps {
+interface CertificationDashboardProps {
   className?: string
 }
 
-export function CertificationDashboard({ className }: CerificationDashboardProps) {
+export function CertificationDashboard({ className }: CertificationDashboardProps) {
   const {
     certifications,
-    streak,
-    currentWeekCount,
+    count: currentWeekCount,
+    weekNumber,
+    season,
     isLoading: isLoadingCertification,
     error: certificationError,
-  } = useCertificationData({ weeks: 12 })
+  } = useCurrentWeekCertifications()
 
   const {
     data: cohortData,
@@ -46,11 +47,12 @@ export function CertificationDashboard({ className }: CerificationDashboardProps
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* 주간 진행률 + 스트릭 */}
+      {/* 주간 진행률 */}
       <WeeklyProgressCard
         certifications={certifications}
         currentWeekCount={currentWeekCount}
-        streak={streak}
+        weekNumber={weekNumber}
+        seasonName={season ? `${season.season_number}기` : undefined}
       />
 
       {/* 기수별 히트맵 */}

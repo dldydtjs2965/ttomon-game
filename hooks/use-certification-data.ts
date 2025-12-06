@@ -1,87 +1,147 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import {
-  certificationQueryOptions,
-} from "@/lib/api/query-options"
-import {
-  checkTodayCertified,
-  getCurrentWeekCount,
-} from "@/lib/certification"
+import { useAuth } from "@/components/auth/auth-provider"
+import { fetchCertifications, fetchCertificationsByWeek } from "@/lib/api/certification"
+import { getActiveSeason, getCurrentWeekNumber } from "@/lib/api/season"
+import { getCurrentUserProfile } from "@/lib/api/user"
 import { getMockCohortHeatmapResponse } from "@/lib/certification/mock-data"
 import type {
-  CertificationData,
-  DailyCertification,
-  WeekSummary,
-  StreakInfo,
+  Certification,
   CohortHeatmapResponse,
 } from "@/lib/certification"
+import type { DbSeason } from "@/lib/types/database"
 import { useState, useCallback, useEffect } from "react"
 
-interface UseCertificationDataOptions {
-  weeks?: number
-  userId?: string
+// ============================================
+// 현재 시즌 정보 훅
+// ============================================
+
+interface UseCurrentSeasonReturn {
+  season: DbSeason | null
+  currentWeekNumber: number
+  isLoading: boolean
+  error: Error | null
 }
 
-interface UseCertificationDataReturn extends CertificationData {
+export function useCurrentSeason(): UseCurrentSeasonReturn {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['season', 'active'],
+    queryFn: getActiveSeason,
+    staleTime: 5 * 60 * 1000, // 5분 캐시
+  })
+
+  const currentWeekNumber = data ? getCurrentWeekNumber(data) : 0
+
+  return {
+    season: data ?? null,
+    currentWeekNumber,
+    isLoading,
+    error: error as Error | null,
+  }
+}
+
+// ============================================
+// 주차별 인증 데이터 훅
+// ============================================
+
+interface UseCertificationsByWeekOptions {
+  weekNumber?: number
+  seasonId?: number
+}
+
+interface UseCertificationsByWeekReturn {
+  certifications: Certification[]
+  count: number
   isLoading: boolean
   error: Error | null
   refetch: () => Promise<void>
 }
 
-export function useCertificationData(
-  options: UseCertificationDataOptions = {}
-): UseCertificationDataReturn {
-  const { weeks = 12, userId = "mock-user" } = options
+export function useCertificationsByWeek(
+  options: UseCertificationsByWeekOptions = {}
+): UseCertificationsByWeekReturn {
+  const { weekNumber, seasonId } = options
+  const { user } = useAuth()
 
-  // 1. 인증 데이터 쿼리
+  const {
+    data: userProfile,
+    isLoading: isLoadingProfile,
+  } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: getCurrentUserProfile,
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const userId = userProfile?.id?.toString()
+
   const {
     data: certifications = [],
     isLoading: isLoadingCertifications,
-    error: certificationError,
-    refetch: refetchCertifications
-  } = useQuery(certificationQueryOptions.list(userId, weeks))
-
-  // 2. 주간 요약 쿼리
-  const {
-    data: weeklySummaries = [],
-    isLoading: isLoadingSummaries,
-    error: summaryError,
-    refetch: refetchSummaries
-  } = useQuery(certificationQueryOptions.summary(userId, weeks))
-
-  // 3. 스트릭 정보 쿼리
-  const {
-    data: streak = { currentStreak: 0, longestStreak: 0, isActive: false },
-    isLoading: isLoadingStreak,
-    error: streakError,
-    refetch: refetchStreak
-  } = useQuery(certificationQueryOptions.streak(userId))
-
-  // 파생 상태 계산
-  const todayCertified = checkTodayCertified(certifications)
-  const currentWeekCount = getCurrentWeekCount(certifications)
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['certifications', userId, weekNumber, seasonId],
+    queryFn: async () => {
+      if (!userId) return []
+      if (weekNumber !== undefined) {
+        return await fetchCertificationsByWeek(userId, weekNumber, seasonId)
+      }
+      return await fetchCertifications(userId, seasonId)
+    },
+    enabled: !!userId,
+  })
 
   const handleRefetch = async () => {
-    await Promise.all([
-      refetchCertifications(),
-      refetchSummaries(),
-      refetchStreak()
-    ])
+    await refetch()
   }
-
-  const isLoading = isLoadingCertifications || isLoadingSummaries || isLoadingStreak
-  const error = (certificationError || summaryError || streakError) as Error | null
 
   return {
     certifications,
-    weeklySummaries,
-    streak,
-    todayCertified,
-    currentWeekCount,
-    isLoading,
-    error,
+    count: certifications.length,
+    isLoading: isLoadingProfile || isLoadingCertifications,
+    error: error as Error | null,
     refetch: handleRefetch,
+  }
+}
+
+// ============================================
+// 현재 주차 인증 데이터 훅 (편의용)
+// ============================================
+
+interface UseCurrentWeekCertificationsReturn {
+  certifications: Certification[]
+  count: number
+  weekNumber: number
+  season: DbSeason | null
+  isLoading: boolean
+  error: Error | null
+  refetch: () => Promise<void>
+}
+
+export function useCurrentWeekCertifications(): UseCurrentWeekCertificationsReturn {
+  const { season, currentWeekNumber, isLoading: isLoadingSeason } = useCurrentSeason()
+
+  const {
+    certifications,
+    count,
+    isLoading: isLoadingCertifications,
+    error,
+    refetch,
+  } = useCertificationsByWeek({
+    weekNumber: currentWeekNumber,
+    seasonId: season?.id,
+  })
+
+  return {
+    certifications,
+    count,
+    weekNumber: currentWeekNumber,
+    season,
+    isLoading: isLoadingSeason || isLoadingCertifications,
+    error,
+    refetch,
   }
 }
 
@@ -118,8 +178,8 @@ export function useCohortHeatmap(
       setIsLoading(true)
       setError(null)
 
-      // Mock 데이터 사용 (추후 실제 API로 교체)
-      // 실제로는 서버에서 페이지네이션 처리
+      // TODO: 실제 API로 교체
+      // 현재는 Mock 데이터 사용
       const response = getMockCohortHeatmapResponse(currentPage, pageSize)
       setData(response)
     } catch (err) {

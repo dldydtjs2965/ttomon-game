@@ -5,12 +5,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { StreakBadge } from "./streak-badge"
 import { WeekDayDots } from "./week-day-dots"
-import type { DailyCertification, StreakInfo } from "@/lib/certification"
+import type { Certification, DailyCertification, StreakInfo } from "@/lib/certification"
 
 interface WeeklyProgressCardProps {
-  certifications: DailyCertification[]
+  certifications: Certification[]
   currentWeekCount: number
-  streak: StreakInfo
+  streak?: StreakInfo
+  weekNumber?: number
+  seasonName?: string
   className?: string
 }
 
@@ -20,6 +22,8 @@ export function WeeklyProgressCard({
   certifications,
   currentWeekCount,
   streak,
+  weekNumber,
+  seasonName,
   className,
 }: WeeklyProgressCardProps) {
   const progressPercent = Math.min((currentWeekCount / WEEKLY_GOAL) * 100, 100)
@@ -31,6 +35,30 @@ export function WeeklyProgressCard({
     return `${WEEKLY_GOAL}번 인증하세요`
   }
 
+  const getWeekTitle = () => {
+    if (seasonName && weekNumber) {
+      return `${seasonName} ${weekNumber}주차`
+    }
+    if (weekNumber) {
+      return `${weekNumber}주차`
+    }
+    return "이번 주"
+  }
+
+  // Convert to DailyCertification format for WeekDayDots
+  const dailyCertifications: DailyCertification[] = certifications
+    .filter(c => c.certificationDate)
+    .map(c => ({
+      date: c.certificationDate!,
+      verified: true
+    }))
+
+  const defaultStreak: StreakInfo = {
+    currentStreak: 0,
+    longestStreak: 0,
+    isActive: false
+  }
+
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardContent className="p-4 sm:p-6">
@@ -40,7 +68,7 @@ export function WeeklyProgressCard({
             <div className="space-y-2">
               <div className="flex items-baseline justify-between">
                 <h3 className="text-sm font-medium text-muted-foreground">
-                  이번 주 진행률
+                  {getWeekTitle()} 진행률
                 </h3>
                 <span
                   className={cn(
@@ -71,12 +99,12 @@ export function WeeklyProgressCard({
             </div>
 
             {/* 요일별 인증 현황 */}
-            <WeekDayDots certifications={certifications} />
+            <WeekDayDots certifications={dailyCertifications} />
           </div>
 
           {/* 우측: 스트릭 뱃지 */}
           <StreakBadge
-            streak={streak}
+            streak={streak || defaultStreak}
             className="sm:ml-4 sm:w-40"
           />
         </div>
