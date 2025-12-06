@@ -42,8 +42,6 @@ export async function GET(request: NextRequest) {
       query = query.eq('season_id', parseInt(seasonId, 10))
     }
 
-    console.log('Query:', query)
-
     const { data, error } = await query
 
     if (error) {

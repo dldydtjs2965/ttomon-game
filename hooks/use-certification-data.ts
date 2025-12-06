@@ -90,7 +90,7 @@ export function useCertificationsByWeek(
       }
       return await fetchCertifications(userId, seasonId)
     },
-    enabled: !!userId,
+    enabled: !!userId && (weekNumber === undefined || weekNumber > 0),
   })
 
   const handleRefetch = async () => {

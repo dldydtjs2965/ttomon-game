@@ -64,10 +64,26 @@ export function getCurrentWeekNumber(season: DbSeason): number {
     if (today > endDate) return season.week_count ?? 0
   }
 
-  // 현재 주차 계산 (시작일 기준)
-  const diffTime = today.getTime() - startDate.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  const weekNumber = Math.floor(diffDays / 7) + 1
+  // 월요일 기준으로 주차 계산
+  // 1. 시즌 시작일이 포함된 주의 월요일 계산
+  const startDay = startDate.getDay()
+  const startDiff = startDate.getDate() - startDay + (startDay === 0 ? -6 : 1)
+  const startMonday = new Date(startDate)
+  startMonday.setDate(startDiff)
+  startMonday.setHours(0, 0, 0, 0)
+
+  // 2. 오늘 날짜가 포함된 주의 월요일 계산
+  const todayDay = today.getDay()
+  const todayDiff = today.getDate() - todayDay + (todayDay === 0 ? -6 : 1)
+  const todayMonday = new Date(today)
+  todayMonday.setDate(todayDiff)
+  todayMonday.setHours(0, 0, 0, 0)
+
+  // 3. 주차 차이 계산
+  const diffTime = todayMonday.getTime() - startMonday.getTime()
+  const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7))
+  
+  const weekNumber = diffWeeks + 1
 
   // week_count를 초과하지 않도록
   if (season.week_count && weekNumber > season.week_count) {
