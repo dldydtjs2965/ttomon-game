@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { WeeklyProgressCard } from "./weekly-progress-card"
 import { CohortHeatmap } from "./cohort-heatmap"
-import { useCurrentWeekCertifications, useCohortHeatmap } from "@/hooks/use-certification-data"
+import { useCurrentWeekCertifications } from "@/hooks/use-certification-data"
 
 interface CertificationDashboardProps {
   className?: string
@@ -21,15 +21,8 @@ export function CertificationDashboard({ className }: CertificationDashboardProp
     error: certificationError,
   } = useCurrentWeekCertifications()
 
-  const {
-    data: cohortData,
-    isLoading: isLoadingCohort,
-    error: cohortError,
-    setPage,
-  } = useCohortHeatmap({ pageSize: 4, seasonId: season?.id })
-
-  const isLoading = isLoadingCertification || isLoadingCohort
-  const error = certificationError || cohortError
+  const isLoading = isLoadingCertification
+  const error = certificationError
 
   if (isLoading) {
     return <CertificationDashboardSkeleton className={className} />
@@ -56,9 +49,7 @@ export function CertificationDashboard({ className }: CertificationDashboardProp
       />
 
       {/* 기수별 히트맵 */}
-      {cohortData && (
-        <CohortHeatmap data={cohortData} onPageChange={setPage} />
-      )}
+      <CohortHeatmap seasonId={season?.id} />
     </div>
   )
 }
@@ -90,49 +81,7 @@ function CertificationDashboardSkeleton({ className }: { className?: string }) {
         </CardContent>
       </Card>
 
-      {/* 기수 히트맵 스켈레톤 */}
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="space-y-4">
-            {/* 헤더 */}
-            <Skeleton className="h-5 w-48" />
 
-            {/* 주차 헤더 */}
-            <div className="flex items-center gap-3">
-              <div className="w-16 md:w-20" />
-              <div className="flex gap-1.5">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12" />
-                ))}
-              </div>
-            </div>
-
-            {/* 나의 행 */}
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-4 w-16 md:w-20" />
-              <div className="flex gap-1.5">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12 rounded-md" />
-                ))}
-              </div>
-            </div>
-
-            <Skeleton className="h-px w-full" />
-
-            {/* 다른 사용자들 */}
-            {Array.from({ length: 4 }).map((_, rowIndex) => (
-              <div key={rowIndex} className="flex items-center gap-3">
-                <Skeleton className="h-4 w-16 md:w-20" />
-                <div className="flex gap-1.5">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12 rounded-md" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

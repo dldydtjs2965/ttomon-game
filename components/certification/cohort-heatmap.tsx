@@ -9,17 +9,53 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { UserRow } from "./user-row"
 
+import { Skeleton } from "@/components/ui/skeleton"
+import { useCohortHeatmap } from "@/hooks/use-certification-data"
+
 interface CohortHeatmapProps {
-  data: CohortHeatmapResponse
-  onPageChange?: (page: number) => void
+  seasonId?: number
   className?: string
 }
 
-export function CohortHeatmap({
+export function CohortHeatmap({ seasonId, className }: CohortHeatmapProps) {
+  const {
+    data,
+    isLoading,
+    error,
+    setPage,
+  } = useCohortHeatmap({ pageSize: 4, seasonId })
+
+  if (isLoading && !data) {
+    return <CohortHeatmapSkeleton className={className} />
+  }
+
+  if (error || !data) {
+    return null // 에러 상황 처리는 상위 결정을 따르거나 여기서 조용히 실패
+  }
+
+  return (
+    <CohortHeatmapDisplay
+      data={data}
+      onPageChange={setPage}
+      className={className}
+      isLoading={isLoading}
+    />
+  )
+}
+
+interface CohortHeatmapDisplayProps {
+  data: CohortHeatmapResponse
+  onPageChange?: (page: number) => void
+  className?: string
+  isLoading?: boolean
+}
+
+function CohortHeatmapDisplay({
   data,
   onPageChange,
   className,
-}: CohortHeatmapProps) {
+  isLoading,
+}: CohortHeatmapDisplayProps) {
   const { cohort, currentUser, otherUsers, pagination } = data
 
   const handlePrevPage = () => {
@@ -76,7 +112,7 @@ export function CohortHeatmap({
               variant="ghost"
               size="icon"
               onClick={handlePrevPage}
-              disabled={!pagination.hasPrev}
+              disabled={!pagination.hasPrev || isLoading}
               className="h-8 w-8"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -91,7 +127,7 @@ export function CohortHeatmap({
               variant="ghost"
               size="icon"
               onClick={handleNextPage}
-              disabled={!pagination.hasNext}
+              disabled={!pagination.hasNext || isLoading}
               className="h-8 w-8"
             >
               <ChevronRight className="h-4 w-4" />
@@ -100,11 +136,58 @@ export function CohortHeatmap({
           </div>
 
           {/* 사용자 목록 */}
-          <div className="space-y-2">
+          <div className={cn("space-y-2 transition-opacity duration-200", isLoading && "opacity-50 pointer-events-none")}>
             {otherUsers.map((userData) => (
               <UserRow key={userData.user.id} data={userData} />
             ))}
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function CohortHeatmapSkeleton({ className }: { className?: string }) {
+  return (
+    <Card className={className}>
+      <CardContent className="p-4 sm:p-6">
+        <div className="space-y-4">
+          {/* 헤더 */}
+          <Skeleton className="h-5 w-48" />
+
+          {/* 주차 헤더 */}
+          <div className="flex items-center gap-3">
+            <div className="w-16 md:w-20" />
+            <div className="flex gap-1.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12" />
+              ))}
+            </div>
+          </div>
+
+          {/* 나의 행 */}
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-4 w-16 md:w-20" />
+            <div className="flex gap-1.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12 rounded-md" />
+              ))}
+            </div>
+          </div>
+
+          <Skeleton className="h-px w-full" />
+
+          {/* 다른 사용자들 */}
+          {Array.from({ length: 4 }).map((_, rowIndex) => (
+            <div key={rowIndex} className="flex items-center gap-3">
+              <Skeleton className="h-4 w-16 md:w-20" />
+              <div className="flex gap-1.5">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-10 md:h-12 md:w-12 rounded-md" />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
