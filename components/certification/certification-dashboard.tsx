@@ -5,20 +5,20 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { WeeklyProgressCard } from "./weekly-progress-card"
 import { CohortHeatmap } from "./cohort-heatmap"
-import { useVerificationData, useCohortHeatmap } from "@/hooks/use-verification-data"
+import { useCertificationData, useCohortHeatmap } from "@/hooks/use-certification-data"
 
-interface VerificationDashboardProps {
+interface CerificationDashboardProps {
   className?: string
 }
 
-export function VerificationDashboard({ className }: VerificationDashboardProps) {
+export function CertificationDashboard({ className }: CerificationDashboardProps) {
   const {
-    verifications,
+    certifications,
     streak,
     currentWeekCount,
-    isLoading: isLoadingVerification,
-    error: verificationError,
-  } = useVerificationData({ weeks: 12 })
+    isLoading: isLoadingCertification,
+    error: certificationError,
+  } = useCertificationData({ weeks: 12 })
 
   const {
     data: cohortData,
@@ -27,11 +27,11 @@ export function VerificationDashboard({ className }: VerificationDashboardProps)
     setPage,
   } = useCohortHeatmap({ pageSize: 4 })
 
-  const isLoading = isLoadingVerification || isLoadingCohort
-  const error = verificationError || cohortError
+  const isLoading = isLoadingCertification || isLoadingCohort
+  const error = certificationError || cohortError
 
   if (isLoading) {
-    return <VerificationDashboardSkeleton className={className} />
+    return <CertificationDashboardSkeleton className={className} />
   }
 
   if (error) {
@@ -48,7 +48,7 @@ export function VerificationDashboard({ className }: VerificationDashboardProps)
     <div className={cn("space-y-4", className)}>
       {/* 주간 진행률 + 스트릭 */}
       <WeeklyProgressCard
-        verifications={verifications}
+        certifications={certifications}
         currentWeekCount={currentWeekCount}
         streak={streak}
       />
@@ -61,7 +61,7 @@ export function VerificationDashboard({ className }: VerificationDashboardProps)
   )
 }
 
-function VerificationDashboardSkeleton({ className }: { className?: string }) {
+function CertificationDashboardSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("space-y-4", className)}>
       {/* 주간 진행률 스켈레톤 */}

@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { Header } from "@/components/layout/header"
-import { VerificationDashboard } from "@/components/verification"
+import { CertificationDashboard } from "@/components/certification"
 
 export default function HomePage() {
   const { isLoading, isAuthenticated } = useAuth()
@@ -26,7 +26,7 @@ export default function HomePage() {
         {/* 인증 대시보드 - 로그인한 사용자만 표시 */}
         {isAuthenticated && (
           <div className="mt-8">
-            <VerificationDashboard />
+            <CertificationDashboard />
           </div>
         )}
 

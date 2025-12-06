@@ -3,7 +3,7 @@
  */
 
 /** 일별 인증 기록 */
-export interface DailyVerification {
+export interface DailyCertification {
   date: string // YYYY-MM-DD
   verified: boolean
   imageUrl?: string // 선택적 (슬랙에서 온 이미지)
@@ -13,7 +13,7 @@ export interface DailyVerification {
 export interface WeekSummary {
   weekStart: string // YYYY-MM-DD (월요일)
   weekEnd: string // YYYY-MM-DD (일요일)
-  verificationCount: number // 0, 1, 2
+  certificationCount: number // 0, 1, 2
   isComplete: boolean // count >= 2
 }
 
@@ -25,17 +25,17 @@ export interface StreakInfo {
 }
 
 /** 인증 데이터 전체 */
-export interface VerificationData {
-  verifications: DailyVerification[]
+export interface CertificationData {
+  certifications: DailyCertification[]
   weeklySummaries: WeekSummary[]
   streak: StreakInfo
-  todayVerified: boolean
+  todayCertified: boolean
   currentWeekCount: number
 }
 
 /** 인증 API 인터페이스 (추후 실제 구현으로 교체 가능) */
-export interface VerificationApi {
-  getVerifications(userId: string, weeks: number): Promise<DailyVerification[]>
+export interface CertificationApi {
+  getCertifications(userId: string, weeks: number): Promise<DailyCertification[]>
   getWeeklySummaries(userId: string, weeks: number): Promise<WeekSummary[]>
   getStreakInfo(userId: string): Promise<StreakInfo>
 }

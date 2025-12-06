@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { UserHeatmapData } from "@/lib/verification"
+import type { UserHeatmapData } from "@/lib/certification"
 import { WeekCell } from "./week-cell"
 
 interface UserRowProps {

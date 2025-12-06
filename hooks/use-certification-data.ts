@@ -2,82 +2,82 @@
 
 import { useQuery } from "@tanstack/react-query"
 import {
-  verificationQueryOptions,
+  certificationQueryOptions,
 } from "@/lib/api/query-options"
 import {
-  checkTodayVerified,
+  checkTodayCertified,
   getCurrentWeekCount,
-} from "@/lib/verification"
-import { getMockCohortHeatmapResponse } from "@/lib/verification/mock-data"
+} from "@/lib/certification"
+import { getMockCohortHeatmapResponse } from "@/lib/certification/mock-data"
 import type {
-  VerificationData,
-  DailyVerification,
+  CertificationData,
+  DailyCertification,
   WeekSummary,
   StreakInfo,
   CohortHeatmapResponse,
-} from "@/lib/verification"
+} from "@/lib/certification"
 import { useState, useCallback, useEffect } from "react"
 
-interface UseVerificationDataOptions {
+interface UseCertificationDataOptions {
   weeks?: number
   userId?: string
 }
 
-interface UseVerificationDataReturn extends VerificationData {
+interface UseCertificationDataReturn extends CertificationData {
   isLoading: boolean
   error: Error | null
   refetch: () => Promise<void>
 }
 
-export function useVerificationData(
-  options: UseVerificationDataOptions = {}
-): UseVerificationDataReturn {
+export function useCertificationData(
+  options: UseCertificationDataOptions = {}
+): UseCertificationDataReturn {
   const { weeks = 12, userId = "mock-user" } = options
 
   // 1. 인증 데이터 쿼리
-  const { 
-    data: verifications = [], 
-    isLoading: isLoadingVerifications,
-    error: verificationError,
-    refetch: refetchVerifications
-  } = useQuery(verificationQueryOptions.list(userId, weeks))
+  const {
+    data: certifications = [],
+    isLoading: isLoadingCertifications,
+    error: certificationError,
+    refetch: refetchCertifications
+  } = useQuery(certificationQueryOptions.list(userId, weeks))
 
   // 2. 주간 요약 쿼리
-  const { 
-    data: weeklySummaries = [], 
+  const {
+    data: weeklySummaries = [],
     isLoading: isLoadingSummaries,
     error: summaryError,
     refetch: refetchSummaries
-  } = useQuery(verificationQueryOptions.summary(userId, weeks))
+  } = useQuery(certificationQueryOptions.summary(userId, weeks))
 
   // 3. 스트릭 정보 쿼리
-  const { 
-    data: streak = { currentStreak: 0, longestStreak: 0, isActive: false }, 
+  const {
+    data: streak = { currentStreak: 0, longestStreak: 0, isActive: false },
     isLoading: isLoadingStreak,
     error: streakError,
     refetch: refetchStreak
-  } = useQuery(verificationQueryOptions.streak(userId))
+  } = useQuery(certificationQueryOptions.streak(userId))
 
   // 파생 상태 계산
-  const todayVerified = checkTodayVerified(verifications)
-  const currentWeekCount = getCurrentWeekCount(verifications)
+  const todayCertified = checkTodayCertified(certifications)
+  const currentWeekCount = getCurrentWeekCount(certifications)
 
   const handleRefetch = async () => {
     await Promise.all([
-      refetchVerifications(),
+      refetchCertifications(),
       refetchSummaries(),
       refetchStreak()
     ])
   }
 
-  const isLoading = isLoadingVerifications || isLoadingSummaries || isLoadingStreak
-  const error = (verificationError || summaryError || streakError) as Error | null
+  const isLoading = isLoadingCertifications || isLoadingSummaries || isLoadingStreak
+  const error = (certificationError || summaryError || streakError) as Error | null
 
   return {
-    verifications,
+    certifications,
     weeklySummaries,
     streak,
-    todayVerified,
+    todayCertified,
     currentWeekCount,
     isLoading,
     error,

@@ -107,5 +107,5 @@ jspm_packages/
 
 # 프로젝트 문서 파일들 (주석 해제시 제외됨)
 # 현재는 개발 참고용으로 포함시킴
-CLAUDE.md
+# CLAUDE.md
 SUPABASE_SETUP.md

@@ -7,25 +7,25 @@ import {
   formatDate,
   isToday,
   isFutureDate,
-} from "@/lib/verification"
-import type { DailyVerification } from "@/lib/verification"
+} from "@/lib/certification"
+import type { DailyCertification } from "@/lib/certification"
 
 interface WeekDayDotsProps {
-  verifications: DailyVerification[]
+  certifications: DailyCertification[]
   className?: string
 }
 
-export function WeekDayDots({ verifications, className }: WeekDayDotsProps) {
+export function WeekDayDots({ certifications, className }: WeekDayDotsProps) {
   const weekDates = getCurrentWeekDates()
-  const verifiedDates = new Set(
-    verifications.filter((v) => v.verified).map((v) => v.date)
+  const certifiedDates = new Set(
+    certifications.filter((c) => c.verified).map((c) => c.date)
   )
 
   return (
     <div className={cn("flex gap-2", className)}>
       {weekDates.map((date) => {
         const dateStr = formatDate(date)
-        const isVerified = verifiedDates.has(dateStr)
+        const isCertified = certifiedDates.has(dateStr)
         const isTodayDate = isToday(date)
         const isFuture = isFutureDate(date)
 
@@ -41,16 +41,16 @@ export function WeekDayDots({ verifications, className }: WeekDayDotsProps) {
               className={cn(
                 "h-6 w-6 rounded-full flex items-center justify-center transition-colors",
                 // 인증 완료
-                isVerified && "bg-primary",
+                isCertified && "bg-primary",
                 // 오늘 (미인증)
-                !isVerified && isTodayDate && "border-2 border-dashed border-primary/50 bg-primary/10",
+                !isCertified && isTodayDate && "border-2 border-dashed border-primary/50 bg-primary/10",
                 // 미래
-                !isVerified && isFuture && "bg-muted/30",
+                !isCertified && isFuture && "bg-muted/30",
                 // 과거 미인증
-                !isVerified && !isTodayDate && !isFuture && "bg-muted/50"
+                !isCertified && !isTodayDate && !isFuture && "bg-muted/50"
               )}
             >
-              {isVerified && (
+              {isCertified && (
                 <svg
                   className="h-3 w-3 text-primary-foreground"
                   fill="none"

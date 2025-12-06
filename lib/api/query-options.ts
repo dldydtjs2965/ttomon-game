@@ -1,36 +1,36 @@
 import { queryOptions } from '@tanstack/react-query'
-import { verificationApi } from '@/lib/api/verification'
+import { certificationApi } from '@/lib/api/certification'
 
 // Query Keys
 export const QUERY_KEYS = {
-  verification: {
-    all: ['verification'] as const,
-    list: (userId: string, weeks: number) => 
-      ['verification', 'list', userId, weeks] as const,
-    summary: (userId: string, weeks: number) => 
-      ['verification', 'summary', userId, weeks] as const,
-    streak: (userId: string) => 
-      ['verification', 'streak', userId] as const,
+  certification: {
+    all: ['certification'] as const,
+    list: (userId: string, weeks: number) =>
+      ['certification', 'list', userId, weeks] as const,
+    summary: (userId: string, weeks: number) =>
+      ['certification', 'summary', userId, weeks] as const,
+    streak: (userId: string) =>
+      ['certification', 'streak', userId] as const,
   },
 } as const
 
 // Query Options
-export const verificationQueryOptions = {
+export const certificationQueryOptions = {
   list: (userId: string, weeks: number) =>
     queryOptions({
-      queryKey: QUERY_KEYS.verification.list(userId, weeks),
-      queryFn: () => verificationApi.getVerifications(userId, weeks),
+      queryKey: QUERY_KEYS.certification.list(userId, weeks),
+      queryFn: () => certificationApi.getCertifications(userId, weeks),
     }),
-  
+
   summary: (userId: string, weeks: number) =>
     queryOptions({
-      queryKey: QUERY_KEYS.verification.summary(userId, weeks),
-      queryFn: () => verificationApi.getWeeklySummaries(userId, weeks),
+      queryKey: QUERY_KEYS.certification.summary(userId, weeks),
+      queryFn: () => certificationApi.getWeeklySummaries(userId, weeks),
     }),
 
   streak: (userId: string) =>
     queryOptions({
-      queryKey: QUERY_KEYS.verification.streak(userId),
-      queryFn: () => verificationApi.getStreakInfo(userId),
+      queryKey: QUERY_KEYS.certification.streak(userId),
+      queryFn: () => certificationApi.getStreakInfo(userId),
     }),
 }

@@ -1,4 +1,4 @@
-import type { DailyVerification, WeekSummary, StreakInfo } from "./types"
+import type { DailyCertification, WeekSummary, StreakInfo } from "./types"
 
 /**
  * 날짜를 YYYY-MM-DD 형식으로 포맷
@@ -71,7 +71,7 @@ export function isFutureDate(date: Date | string): boolean {
  * 인증 데이터로부터 주간 요약 생성
  */
 export function generateWeeklySummaries(
-  verifications: DailyVerification[],
+  certifications: DailyCertification[],
   weeks: number = 12
 ): WeekSummary[] {
   const summaries: WeekSummary[] = []
@@ -87,16 +87,16 @@ export function generateWeeklySummaries(
     weekEnd.setDate(weekStart.getDate() + 6)
 
     // 해당 주의 인증 횟수 계산
-    const weekVerifications = verifications.filter((v) => {
-      const vDate = new Date(v.date)
-      return v.verified && vDate >= weekStart && vDate <= weekEnd
+    const weekCertifications = certifications.filter((c) => {
+      const cDate = new Date(c.date)
+      return c.verified && cDate >= weekStart && cDate <= weekEnd
     })
 
     summaries.push({
       weekStart: formatDate(weekStart),
       weekEnd: formatDate(weekEnd),
-      verificationCount: weekVerifications.length,
-      isComplete: weekVerifications.length >= 2,
+      certificationCount: weekCertifications.length,
+      isComplete: weekCertifications.length >= 2,
     })
   }
 
@@ -153,22 +153,22 @@ export function calculateStreak(summaries: WeekSummary[]): StreakInfo {
 /**
  * 이번 주 인증 횟수 계산
  */
-export function getCurrentWeekCount(verifications: DailyVerification[]): number {
+export function getCurrentWeekCount(certifications: DailyCertification[]): number {
   const today = new Date()
   const { start, end } = getWeekBounds(today)
 
-  return verifications.filter((v) => {
-    const vDate = new Date(v.date)
-    return v.verified && vDate >= start && vDate <= end
+  return certifications.filter((c) => {
+    const cDate = new Date(c.date)
+    return c.verified && cDate >= start && cDate <= end
   }).length
 }
 
 /**
  * 오늘 인증했는지 확인
  */
-export function checkTodayVerified(verifications: DailyVerification[]): boolean {
+export function checkTodayCertified(certifications: DailyCertification[]): boolean {
   const todayStr = formatDate(new Date())
-  return verifications.some((v) => v.date === todayStr && v.verified)
+  return certifications.some((c) => c.date === todayStr && c.verified)
 }
 
 /**

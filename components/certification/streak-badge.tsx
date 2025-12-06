@@ -2,7 +2,7 @@
 
 import { Flame, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { StreakInfo } from "@/lib/verification"
+import type { StreakInfo } from "@/lib/certification"
 
 interface StreakBadgeProps {
   streak: StreakInfo

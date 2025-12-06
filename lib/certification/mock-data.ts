@@ -1,5 +1,5 @@
 import type {
-  DailyVerification,
+  DailyCertification,
   CohortInfo,
   CohortMember,
   UserHeatmapData,
@@ -13,8 +13,8 @@ import { formatDate, getWeekBounds } from "./utils"
  * 실제 구현 시 이 파일을 Supabase 연동으로 교체
  */
 
-function generateMockVerifications(): DailyVerification[] {
-  const verifications: DailyVerification[] = []
+function generateMockCertifications(): DailyCertification[] {
+  const certifications: DailyCertification[] = []
   const today = new Date()
   const { start: currentWeekStart } = getWeekBounds(today)
 
@@ -25,7 +25,7 @@ function generateMockVerifications(): DailyVerification[] {
 
     // 각 주별로 랜덤하게 0~2회 인증
     // 최근 주일수록 인증 확률 높임 (동기부여 데모용)
-    const verificationDays: number[] = []
+    const certificationDays: number[] = []
     const baseChance = weekOffset < 4 ? 0.8 : 0.5
 
     // 일주일 중 랜덤한 날짜 선택
@@ -42,48 +42,48 @@ function generateMockVerifications(): DailyVerification[] {
     // 주 2회 인증 목표에 맞춰 데이터 생성
     if (Math.random() < baseChance && filteredDays.length > 0) {
       const randomIndex = Math.floor(Math.random() * filteredDays.length)
-      verificationDays.push(filteredDays[randomIndex])
+      certificationDays.push(filteredDays[randomIndex])
     }
 
     if (Math.random() < baseChance && filteredDays.length > 1) {
       let secondDay: number
       do {
         secondDay = filteredDays[Math.floor(Math.random() * filteredDays.length)]
-      } while (verificationDays.includes(secondDay))
-      verificationDays.push(secondDay)
+      } while (certificationDays.includes(secondDay))
+      certificationDays.push(secondDay)
     }
 
     // 인증 데이터 추가
-    for (const dayOfWeek of verificationDays) {
-      const verificationDate = new Date(weekStart)
+    for (const dayOfWeek of certificationDays) {
+      const certificationDate = new Date(weekStart)
       // 월요일 기준으로 오프셋 계산
       const dayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-      verificationDate.setDate(weekStart.getDate() + dayOffset)
+      certificationDate.setDate(weekStart.getDate() + dayOffset)
 
       // 미래 날짜는 제외
-      if (verificationDate <= today) {
-        verifications.push({
-          date: formatDate(verificationDate),
+      if (certificationDate <= today) {
+        certifications.push({
+          date: formatDate(certificationDate),
           verified: true,
         })
       }
     }
   }
 
-  return verifications.sort(
+  return certifications.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 }
 
 // 고정된 Mock 데이터 (재현 가능한 데모용)
-export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
+export const MOCK_CERTIFICATIONS: DailyCertification[] = (() => {
   const today = new Date()
   const { start: currentWeekStart } = getWeekBounds(today)
-  const verifications: DailyVerification[] = []
+  const certifications: DailyCertification[] = []
 
   // 이번 주: 월요일에 1회 인증 (진행 중)
   const thisMonday = new Date(currentWeekStart)
-  verifications.push({
+  certifications.push({
     date: formatDate(thisMonday),
     verified: true,
   })
@@ -94,7 +94,7 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
     weekStart.setDate(weekStart.getDate() - weekOffset * 7)
 
     // 월요일
-    verifications.push({
+    certifications.push({
       date: formatDate(weekStart),
       verified: true,
     })
@@ -102,7 +102,7 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
     // 목요일
     const thursday = new Date(weekStart)
     thursday.setDate(weekStart.getDate() + 3)
-    verifications.push({
+    certifications.push({
       date: formatDate(thursday),
       verified: true,
     })
@@ -111,7 +111,7 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
   // 4주 전: 1회만 인증 (스트릭 끊김)
   const week4Start = new Date(currentWeekStart)
   week4Start.setDate(week4Start.getDate() - 4 * 7)
-  verifications.push({
+  certifications.push({
     date: formatDate(week4Start),
     verified: true,
   })
@@ -121,14 +121,14 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
     const weekStart = new Date(currentWeekStart)
     weekStart.setDate(weekStart.getDate() - weekOffset * 7)
 
-    verifications.push({
+    certifications.push({
       date: formatDate(weekStart),
       verified: true,
     })
 
     const wednesday = new Date(weekStart)
     wednesday.setDate(weekStart.getDate() + 2)
-    verifications.push({
+    certifications.push({
       date: formatDate(wednesday),
       verified: true,
     })
@@ -142,7 +142,7 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
       const weekStart = new Date(currentWeekStart)
       weekStart.setDate(weekStart.getDate() - weekOffset * 7)
 
-      verifications.push({
+      certifications.push({
         date: formatDate(weekStart),
         verified: true,
       })
@@ -150,7 +150,7 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
       if (Math.random() > 0.5) {
         const friday = new Date(weekStart)
         friday.setDate(weekStart.getDate() + 4)
-        verifications.push({
+        certifications.push({
           date: formatDate(friday),
           verified: true,
         })
@@ -158,13 +158,13 @@ export const MOCK_VERIFICATIONS: DailyVerification[] = (() => {
     }
   }
 
-  return verifications.sort(
+  return certifications.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 })()
 
 // 동적 Mock 데이터 (매번 다른 결과)
-export const generateDynamicMockData = generateMockVerifications
+export const generateDynamicMockData = generateMockCertifications
 
 // ============================================
 // 기수별 히트맵 Mock 데이터

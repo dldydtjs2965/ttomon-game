@@ -1,4 +1,4 @@
-export { VerificationDashboard } from "./verification-dashboard"
+export { CertificationDashboard } from "./certification-dashboard"
 export { WeeklyProgressCard } from "./weekly-progress-card"
 export { StreakBadge } from "./streak-badge"
 export { WeekDayDots } from "./week-day-dots"

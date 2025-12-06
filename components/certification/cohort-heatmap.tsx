@@ -2,8 +2,8 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { CohortHeatmapResponse } from "@/lib/verification"
-import { formatDateRange } from "@/lib/verification"
+import type { CohortHeatmapResponse } from "@/lib/certification"
+import { formatDateRange } from "@/lib/certification"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"

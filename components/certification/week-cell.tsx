@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { getIntensityLevel } from "@/lib/verification"
+import { getIntensityLevel } from "@/lib/certification"
 import {
   Tooltip,
   TooltipContent,

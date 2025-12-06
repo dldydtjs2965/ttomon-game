@@ -5,10 +5,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { StreakBadge } from "./streak-badge"
 import { WeekDayDots } from "./week-day-dots"
-import type { DailyVerification, StreakInfo } from "@/lib/verification"
+import type { DailyCertification, StreakInfo } from "@/lib/certification"
 
 interface WeeklyProgressCardProps {
-  verifications: DailyVerification[]
+  certifications: DailyCertification[]
   currentWeekCount: number
   streak: StreakInfo
   className?: string
@@ -17,7 +17,7 @@ interface WeeklyProgressCardProps {
 const WEEKLY_GOAL = 2
 
 export function WeeklyProgressCard({
-  verifications,
+  certifications,
   currentWeekCount,
   streak,
   className,
@@ -71,7 +71,7 @@ export function WeeklyProgressCard({
             </div>
 
             {/* 요일별 인증 현황 */}
-            <WeekDayDots verifications={verifications} />
+            <WeekDayDots certifications={certifications} />
           </div>
 
           {/* 우측: 스트릭 뱃지 */}

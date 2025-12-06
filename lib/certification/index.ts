@@ -1,10 +1,10 @@
 // Types
 export type {
-  DailyVerification,
+  DailyCertification,
   WeekSummary,
   StreakInfo,
-  VerificationData,
-  VerificationApi,
+  CertificationData,
+  CertificationApi,
   // 기수별 히트맵 타입
   CohortInfo,
   CohortMember,
@@ -24,7 +24,7 @@ export {
   generateWeeklySummaries,
   calculateStreak,
   getCurrentWeekCount,
-  checkTodayVerified,
+  checkTodayCertified,
   getCurrentWeekDates,
   getDayName,
   formatDateKorean,
@@ -37,7 +37,7 @@ export {
 
 // Mock Data
 export {
-  MOCK_VERIFICATIONS,
+  MOCK_CERTIFICATIONS,
   generateDynamicMockData,
   // 기수별 히트맵 Mock 데이터
   MOCK_COHORT,
@@ -47,4 +47,4 @@ export {
 } from "./mock-data"
 
 // API
-export { verificationApi, mockVerificationApi } from "@/lib/api/verification"
+export { certificationApi, mockCertificationApi } from "@/lib/api/certification"
