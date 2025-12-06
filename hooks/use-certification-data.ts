@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/components/auth/auth-provider"
-import { fetchCertifications, fetchCertificationsByWeek } from "@/lib/api/certification"
+import { fetchCertifications, fetchCertificationsByWeek, fetchCohortHeatmap } from "@/lib/api/certification"
 import { getActiveSeason, getCurrentWeekNumber } from "@/lib/api/season"
 import { getCurrentUserProfile } from "@/lib/api/user"
-import { getMockCohortHeatmapResponse } from "@/lib/certification/mock-data"
+
 import type {
   Certification,
   CohortHeatmapResponse,
@@ -152,6 +152,7 @@ export function useCurrentWeekCertifications(): UseCurrentWeekCertificationsRetu
 interface UseCohortHeatmapOptions {
   pageSize?: number
   initialPage?: number
+  seasonId?: number
 }
 
 interface UseCohortHeatmapReturn {
@@ -166,7 +167,7 @@ interface UseCohortHeatmapReturn {
 export function useCohortHeatmap(
   options: UseCohortHeatmapOptions = {}
 ): UseCohortHeatmapReturn {
-  const { pageSize = 4, initialPage = 0 } = options
+  const { pageSize = 4, initialPage = 0, seasonId } = options
 
   const [data, setData] = useState<CohortHeatmapResponse | null>(null)
   const [currentPage, setCurrentPage] = useState(initialPage)
@@ -178,10 +179,10 @@ export function useCohortHeatmap(
       setIsLoading(true)
       setError(null)
 
-      // TODO: 실제 API로 교체
-      // 현재는 Mock 데이터 사용
-      const response = getMockCohortHeatmapResponse(currentPage, pageSize)
+      // 기수별 히트맵 데이터 조회
+      const response = await fetchCohortHeatmap(currentPage, pageSize, options.seasonId)
       setData(response)
+
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch cohort data"))
       console.error("[CohortHeatmap] Error fetching data:", err)

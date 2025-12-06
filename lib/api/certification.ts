@@ -1,7 +1,15 @@
-import type { DailyCertification, WeekSummary, StreakInfo, CertificationApi, Certification } from "@/lib/certification/types"
+import type { 
+  DailyCertification, 
+  WeekSummary, 
+  StreakInfo, 
+  CertificationApi, 
+  Certification,
+  CohortHeatmapResponse 
+} from "@/lib/certification/types"
 import type { DbCertification } from "@/lib/types/database"
 import { MOCK_CERTIFICATIONS } from "@/lib/certification/mock-data"
 import { generateWeeklySummaries, calculateStreak } from "@/lib/certification/utils"
+import { createBrowserSupabase } from "@/lib/supabase/browser"
 
 /**
  * DB 인증 데이터를 프론트엔드 타입으로 변환
@@ -115,3 +123,51 @@ export const mockCertificationApi: CertificationApi = {
  * 현재 활성화된 API
  */
 export const certificationApi = mockCertificationApi
+
+/**
+ * 기수별 히트맵 데이터 조회 (Edge Function 호출)
+ */
+export async function fetchCohortHeatmap(
+  page: number = 0,
+  pageSize: number = 4,
+  seasonId?: number
+): Promise<CohortHeatmapResponse> {
+  const supabase = createBrowserSupabase()
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw new Error('로그인이 필요합니다.')
+  }
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+  })
+
+  if (seasonId !== undefined) {
+    params.append('seasonId', seasonId.toString())
+  }
+
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/(.+?)\.supabase\.co/)?.[1]
+  
+  if (!projectRef) {
+    throw new Error('Supabase URL설정이 올바르지 않습니다.')
+  }
+
+  const functionUrl = `https://${projectRef}.functions.supabase.co/certifications/cohort`
+
+  const response = await fetch(`${functionUrl}?${params.toString()}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || '히트맵 데이터를 가져오는데 실패했습니다.')
+  }
+
+  return await response.json()
+}

@@ -26,7 +26,7 @@ export function CertificationDashboard({ className }: CertificationDashboardProp
     isLoading: isLoadingCohort,
     error: cohortError,
     setPage,
-  } = useCohortHeatmap({ pageSize: 4 })
+  } = useCohortHeatmap({ pageSize: 4, seasonId: season?.id })
 
   const isLoading = isLoadingCertification || isLoadingCohort
   const error = certificationError || cohortError
